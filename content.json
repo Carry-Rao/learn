@@ -17,7 +17,7 @@
         {
           "name": "编译期编程",
           "slug": "compile-time",
-          "articles": ["01-constexpr", "02-consteval-constinit", "03-static-assert", "04-type-traits", "05-decltype", "06-template-metaprogramming"]
+          "articles": ["01-constexpr", "02-consteval-constinit", "03-static-assert", "04-type-traits", "05-decltype", "06-template-metaprogramming", "07-compiler-optimizations"]
         },
         {
           "name": "面向对象",
