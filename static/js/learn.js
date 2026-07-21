@@ -1,4 +1,5 @@
 import { parseMarkdown } from './markdown.js';
+import { renderCode } from './code/render.js';
 
 const REPO = 'Carry-Rao/learn';
 let data = null;
@@ -133,7 +134,10 @@ async function render(path) {
         <div class="meta">${cat.name} / ${col.name}</div>
         <div class="content">${md.html}</div>
       </div>`;
-      hljs.highlightAll();
+      for (let i = 1; i <= md.codeCount; i++) {
+        const dom = document.querySelector(`#code-block-${i}`);
+        if (dom) renderCode(md.codeBlocks[i], md.codeLangs[i], dom);
+      }
     }
   } catch (e) {
     app.innerHTML = `<div class="error">加载失败: ${e.message}<br><br><button onclick="location.reload()">重试</button></div>`;

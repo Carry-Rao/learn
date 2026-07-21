@@ -26,10 +26,13 @@ function parseInline(line) {
 
 export function parseMarkdown(raw) {
   const lines = raw.split("\n");
+  const codeBlocks = [];
+  const codeLangs = [];
   const htmlParts = [];
   let inCode = false;
   let codeContent = "";
   let codeLang = "";
+  let codeIdx = 0;
   const tableHeader = [];
   const tableRows = [];
   let inTable = false;
@@ -47,25 +50,28 @@ export function parseMarkdown(raw) {
   }
 
   for (let i = 0; i < lines.length; i++) {
-    const line = escapeHtml(lines[i]);
-
-    if (line.startsWith("```")) {
+    if (lines[i].startsWith("```")) {
       if (!inCode) {
-        codeLang = line.slice(3).trim();
+        codeIdx++;
+        codeLang = lines[i].slice(3).trim();
         codeContent = "";
+        codeLangs[codeIdx] = codeLang;
+        codeBlocks[codeIdx] = "";
         inCode = true;
       } else {
-        const lang = codeLang ? ` class="language-${codeLang}"` : '';
-        htmlParts.push(`<pre><code${lang}>${codeContent}</code></pre>`);
+        codeBlocks[codeIdx] = codeContent;
+        htmlParts.push(`<div id="code-block-${codeIdx}" class="code-block"></div>`);
         inCode = false;
       }
       continue;
     }
 
     if (inCode) {
-      codeContent += line + "\n";
+      codeContent += lines[i] + "\n";
       continue;
     }
+
+    const line = escapeHtml(lines[i]);
 
     if (line.startsWith("|") && line.endsWith("|")) {
       flushList();
@@ -124,6 +130,9 @@ export function parseMarkdown(raw) {
   }
 
   return {
-    html: htmlParts.join("")
+    html: htmlParts.join(""),
+    codeBlocks,
+    codeLangs,
+    codeCount: codeIdx
   };
 }
