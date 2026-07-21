@@ -118,3 +118,29 @@ v.erase(std::remove(v.begin(), v.end(), 2), v.end());
 - `erase-remove` 是删除元素的惯用法
 - `lower_bound`/`upper_bound` 在已排序区间查找比 `find` 快得多
 - `<numeric>` 的 `accumulate` / `partial_sum` 也很常用
+
+## sort 自定义比较
+
+`std::sort` 默认升序（`operator<`），可传入自定义比较器：
+
+```cpp
+std::vector<int> v = {5, 2, 8, 1, 9};
+
+// 降序
+std::sort(v.begin(), v.end(), std::greater<int>{});
+
+// 自定义 lambda
+std::sort(v.begin(), v.end(), [](int a, int b) {
+    return a > b;  // 降序
+});
+
+// 按绝对值排序
+std::sort(v.begin(), v.end(), [](int a, int b) {
+    return std::abs(a) < std::abs(b);
+});
+```
+
+比较器必须满足**严格弱序**（strict weak ordering）：
+- `cmp(a, a)` 始终 false
+- 若 `cmp(a, b)` 为 true，则 `cmp(b, a)` 为 false
+- 传递性
