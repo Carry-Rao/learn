@@ -27,7 +27,7 @@
         {
           "name": "标准库",
           "slug": "stl",
-          "articles": ["01-vector", "02-array", "03-string-detail", "04-map-set", "05-algorithms", "06-iterators", "07-concurrency", "08-filesystem", "09-functional"]
+          "articles": ["01-vector", "02-array", "03-string-detail", "04-map-set", "05-algorithms", "06-iterators", "07-concurrency", "08-filesystem", "09-functional", "10-utility", "11-chrono-random"]
         }
       ]
     }
