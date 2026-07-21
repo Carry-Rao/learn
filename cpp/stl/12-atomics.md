@@ -189,3 +189,145 @@ ref.store(5);       // 原子写入 x
 - 默认用 `seq_cst`，性能敏感时再考虑放宽
 - `atomic<int>`/`atomic<bool>` 通常无锁，复杂类型不一定
 - 复杂同步逻辑优先用 mutex，无锁编程容易出错
+- 优先 `lock_guard` / `scoped_lock` 而非裸 `lock/unlock`
+- 避免死锁：始终以相同顺序加锁，或用 `scoped_lock`
+- `std::async`（`<future>`）也是简单并发手段
+
+## mutex
+
+`std::mutex` 提供互斥访问，是 pthread_mutex 的 RAII 封装。
+
+### mutex 原理
+
+```cpp
+// 简化实现
+class mutex {
+    pthread_mutex_t mtx_;
+public:
+    mutex() { pthread_mutex_init(&mtx_, nullptr); }
+    void lock() { pthread_mutex_lock(&mtx_); }
+    void unlock() { pthread_mutex_unlock(&mtx_); }
+    ~mutex() { pthread_mutex_destroy(&mtx_); }
+};
+```
+
+不同平台的底层实现：
+- Linux：`futex`（fast userspace mutex），无竞争时在用户态自旋，不陷入内核
+- Windows：`CRITICAL_SECTION` + `SRWLOCK`
+- macOS：`pthread_mutex` 或 `os_unfair_lock`
+
+futex 原理：用户态原子操作尝试加锁，失败时通过系统调用休眠，避免忙等。
+
+## lock_guard
+
+RAII 锁，构造时加锁，析构时解锁：
+
+```cpp
+std::mutex mtx;
+
+void safe_increment() {
+    std::lock_guard<std::mutex> lock(mtx);
+    // 临界区
+    counter++;
+}  // 自动 unlock
+```
+
+### 原理
+
+```cpp
+template <typename Mutex>
+class lock_guard {
+    Mutex& mtx_;
+public:
+    explicit lock_guard(Mutex& m) : mtx_(m) { mtx_.lock(); }
+    ~lock_guard() { mtx_.unlock(); }
+    lock_guard(const lock_guard&) = delete;
+    lock_guard& operator=(const lock_guard&) = delete;
+};
+```
+
+## unique_lock
+
+比 `lock_guard` 更灵活，可延迟加锁、提前解锁、转移所有权：
+
+```cpp
+std::unique_lock<std::mutex> lock(mtx);               // 立即加锁
+
+std::unique_lock<std::mutex> lock(mtx, std::defer_lock);  // 延迟
+lock.lock();
+
+std::unique_lock<std::mutex> lock(mtx, std::try_to_lock); // 尝试
+if (lock.owns_lock()) { /* ... */ }
+
+lock.unlock();  // 提前解锁
+```
+
+`condition_variable` 要求 `unique_lock`，因为 wait 内部需要解锁和重加锁。
+
+## scoped_lock（C++17）
+
+一次性锁定多个 mutex，避免死锁：
+
+```cpp
+std::mutex m1, m2;
+
+void transfer() {
+    std::scoped_lock lock(m1, m2);  // 同时锁两个
+    // 安全操作共享资源
+}  // 自动解锁
+```
+
+等价于 `std::lock(m1, m2)` + `lock_guard`，底层使用死锁避免算法（如按地址排序加锁）。
+
+## 条件变量
+
+```cpp
+#include <condition_variable>
+
+std::mutex mtx;
+std::condition_variable cv;
+bool ready = false;
+
+void worker() {
+    std::unique_lock<std::mutex> lock(mtx);
+    cv.wait(lock, []{ return ready; });  // 等价于 while(!ready) cv.wait(lock);
+    // ready == true，继续工作
+}
+
+void notify() {
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        ready = true;
+    }
+    cv.notify_one();  // 或 notify_all()
+}
+```
+
+### 原理
+
+`condition_variable` 封装 pthread_cond_t：
+
+```cpp
+// 简化实现
+class condition_variable {
+    pthread_cond_t cv_;
+public:
+    condition_variable() { pthread_cond_init(&cv_, nullptr); }
+
+    void wait(std::unique_lock<std::mutex>& lock) {
+        // 原子地：解锁 mutex + 休眠等待唤醒
+        pthread_cond_wait(&cv_, lock.mutex()->native_handle());
+        // 被唤醒后重新加锁
+    }
+
+    void notify_one() { pthread_cond_signal(&cv_); }
+    void notify_all() { pthread_cond_broadcast(&cv_); }
+
+    ~condition_variable() { pthread_cond_destroy(&cv_); }
+};
+```
+
+关键行为：
+1. `wait` 原子性地解锁 mutex 并休眠
+2. 被 `notify` 唤醒后，在返回前重新加锁
+3. 虚假唤醒（spurious wakeup）可能发生，因此需要 while 循环或谓词重载
