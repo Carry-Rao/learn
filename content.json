@@ -1,0 +1,35 @@
+{
+  "categories": [
+    {
+      "name": "C++",
+      "slug": "cpp",
+      "columns": [
+        {
+          "name": "基础入门",
+          "slug": "basic",
+          "articles": ["01-hello-world", "02-variables", "03-constants", "04-input-output", "05-operators", "06-control-flow", "07-loops", "08-functions", "09-overload", "10-arrays", "11-strings", "12-pointers-refs"]
+        },
+        {
+          "name": "核心基础",
+          "slug": "core",
+          "articles": ["01-lvalue-rvalue", "02-references", "03-dynamic-memory", "04-struct-class", "05-templates", "06-RAII", "07-move-semantics", "08-forward", "09-exceptions", "10-lambdas", "11-noexcept", "12-extern-c"]
+        },
+        {
+          "name": "编译期编程",
+          "slug": "compile-time",
+          "articles": ["01-constexpr", "02-consteval-constinit", "03-static-assert", "04-type-traits", "05-decltype", "06-template-metaprogramming"]
+        },
+        {
+          "name": "面向对象",
+          "slug": "oop",
+          "articles": ["01-inheritance", "02-polymorphism", "03-encapsulation"]
+        },
+        {
+          "name": "标准库",
+          "slug": "stl",
+          "articles": ["01-vector", "02-string-detail", "03-map-set", "04-algorithms", "05-iterators", "06-concurrency", "07-filesystem"]
+        }
+      ]
+    }
+  ]
+}
