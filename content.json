@@ -12,7 +12,7 @@
         {
           "name": "核心基础",
           "slug": "core",
-          "articles": ["01-lvalue-rvalue", "02-references", "03-dynamic-memory", "04-struct-class", "05-templates", "06-RAII", "07-move-semantics", "08-forward", "09-exceptions", "10-lambdas", "11-noexcept", "12-extern-c"]
+          "articles": ["01-lvalue-rvalue", "02-references", "03-dynamic-memory", "04-struct-class", "05-templates", "06-RAII", "07-move-semantics", "08-forward", "09-exceptions", "10-lambdas", "11-noexcept", "12-extern-c", "13-enum-class"]
         },
         {
           "name": "编译期编程",
