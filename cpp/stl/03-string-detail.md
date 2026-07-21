@@ -58,3 +58,38 @@ s.compare(other);       // 比较，相等返回 0
 s.data();               // 获取 C 风格字符串指针
 s.c_str();              // 获取 const char*
 ```
+
+## std::string_view（C++17）
+
+非拥有视图，零拷贝只读访问，替代 `const std::string&` 作函数参数。
+
+```cpp
+#include <string_view>
+
+void process(std::string_view sv) {
+    // 无分配开销
+}
+
+process("hello");                // 字面量→无分配
+std::string s = "world";
+process(s);                      // 兼容 std::string
+```
+
+```cpp
+std::string_view sv = "Hello, World!";
+
+sv.remove_prefix(7);    // "World!"
+sv.remove_suffix(1);    // "World"
+sv.substr(0, 3);        // "Wor"
+sv.find("World");       // 0
+sv.starts_with("Wor");  // true（C++20）
+```
+
+**注意**：`string_view` 不拥有数据，不保证 `\0` 结尾，注意生命周期。
+
+```cpp
+std::string_view bad() {
+    std::string s = "temp";
+    return s;  // s 析构后 sv 悬垂！
+}
+```
