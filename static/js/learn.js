@@ -69,6 +69,7 @@ async function render(path) {
   try {
     if (!path || path === '') {
       const cats = await getCategories();
+      updateGithubLink('');
       renderBreadcrumb([]);
       app.innerHTML = `<div class="category-grid">${cats.map(c =>
         `<div class="card category-card" data-path="${c.name}">
@@ -86,6 +87,7 @@ async function render(path) {
     if (parts.length === 1) {
       const [cat] = parts;
       const cols = await getColumns(cat);
+      updateGithubLink(cat);
       crumbs.push({ path: cat, name: fileNameToTitle(cat) });
       renderBreadcrumb(crumbs);
       app.innerHTML = `<div class="column-list">${cols.map(c =>
@@ -104,6 +106,7 @@ async function render(path) {
       const [cat, col] = parts;
       const arts = await getArticles(cat, col);
       crumbs.push({ path: cat, name: fileNameToTitle(cat) });
+      updateGithubLink(cat + '/' + col);
       crumbs.push({ path: `${cat}/${col}`, name: fileNameToTitle(col) });
       renderBreadcrumb(crumbs);
       app.innerHTML = `<div class="article-list">${arts.map((a, i) => {
@@ -124,6 +127,7 @@ async function render(path) {
       const file = slug.endsWith('.md') ? slug : slug + '.md';
       crumbs.push({ path: cat, name: fileNameToTitle(cat) });
       crumbs.push({ path: `${cat}/${col}`, name: fileNameToTitle(col) });
+      updateGithubLink(cat + '/' + col + '/' + file);
       crumbs.push({ path: `${cat}/${col}/${slug}`, name: fileNameToTitle(file) });
       renderBreadcrumb(crumbs);
 
@@ -141,6 +145,12 @@ async function render(path) {
   } catch (e) {
     app.innerHTML = `<div class="error">加载失败: ${e.message}<br><br><button onclick="location.reload()">重试</button></div>`;
   }
+}
+
+function updateGithubLink(path) {
+  const btn = document.querySelector('#github-btn');
+  if (!path) btn.href = `https://github.com/${REPO}`;
+  else btn.href = `https://github.com/${REPO}/tree/main/${path}`;
 }
 
 export function init() {

@@ -73,6 +73,14 @@ header h1:hover { opacity: 0.8; }
 .error { text-align: center; padding: 60px 20px; color: #e74c3c; }
 .error button { margin-top: 16px; padding: 8px 20px; border: 0; border-radius: 6px; background: #2980b9; color: #fff; cursor: pointer; }
 
+.github-btn {
+  color: #fff; text-decoration: none; font-size: 14px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 6px;
+  background: rgba(255,255,255,0.1); transition: background 0.15s;
+}
+.github-btn:hover { background: rgba(255,255,255,0.2); }
+
 @media (max-width: 700px) {
   header { padding: 16px 20px; }
   .category-grid, .column-list { grid-template-columns: 1fr; }
