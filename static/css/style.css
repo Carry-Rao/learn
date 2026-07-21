@@ -62,7 +62,8 @@ header h1:hover { opacity: 0.8; }
 .article-detail .content ul, .article-detail .content ol { margin: 10px 0; padding-left: 24px; }
 .article-detail .content li { margin: 4px 0; }
 .article-detail .content code.code-inline { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 14px; font-family: "Fira Code", monospace; }
-.article-detail .content .code-block { background: #2d2d2d; color: #f8f8f2; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 14px 0; font-family: "Fira Code", monospace; font-size: 14px; white-space: pre; }
+.article-detail .content pre { background: #2d2d2d; border-radius: 8px; overflow-x: auto; margin: 14px 0; padding: 0; }
+.article-detail .content pre code { display: block; padding: 16px; color: #f8f8f2; font-family: "Fira Code", "Cascadia Code", monospace; font-size: 14px; line-height: 1.5; white-space: pre; }
 .article-detail .content img { max-width: 100%; border-radius: 8px; margin: 10px 0; }
 .article-detail .content table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
 .article-detail .content th, .article-detail .content td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }

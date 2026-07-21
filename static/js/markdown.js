@@ -26,13 +26,10 @@ function parseInline(line) {
 
 export function parseMarkdown(raw) {
   const lines = raw.split("\n");
-  const codeBlocks = [];
-  const codeLangs = [];
   const htmlParts = [];
   let inCode = false;
   let codeContent = "";
   let codeLang = "";
-  let codeIdx = 0;
   const tableHeader = [];
   const tableRows = [];
   let inTable = false;
@@ -54,15 +51,12 @@ export function parseMarkdown(raw) {
 
     if (line.startsWith("```")) {
       if (!inCode) {
-        codeIdx++;
         codeLang = line.slice(3).trim();
         codeContent = "";
-        codeLangs[codeIdx] = codeLang;
-        codeBlocks[codeIdx] = "";
         inCode = true;
       } else {
-        codeBlocks[codeIdx] = codeContent;
-        htmlParts.push(`<div id="code-block-${codeIdx}" class="code-block"></div>`);
+        const lang = codeLang ? ` class="language-${codeLang}"` : '';
+        htmlParts.push(`<pre><code${lang}>${codeContent}</code></pre>`);
         inCode = false;
       }
       continue;
@@ -130,9 +124,6 @@ export function parseMarkdown(raw) {
   }
 
   return {
-    html: htmlParts.join(""),
-    codeBlocks,
-    codeLangs,
-    codeCount: codeIdx
+    html: htmlParts.join("")
   };
 }
