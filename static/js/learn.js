@@ -45,6 +45,7 @@ function navigate(parts) {
 function updateGithubLink(path) {
   const btn = document.querySelector('#github-btn');
   if (!path) btn.href = `https://github.com/${REPO}`;
+  else if (path.endsWith('.md')) btn.href = `https://github.com/${REPO}/blob/main/${path}`;
   else btn.href = `https://github.com/${REPO}/tree/main/${path}`;
 }
 
