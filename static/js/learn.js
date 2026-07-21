@@ -133,6 +133,7 @@ async function render(path) {
         <div class="meta">${cat.name} / ${col.name}</div>
         <div class="content">${md.html}</div>
       </div>`;
+      hljs.highlightAll();
     }
   } catch (e) {
     app.innerHTML = `<div class="error">加载失败: ${e.message}<br><br><button onclick="location.reload()">重试</button></div>`;
