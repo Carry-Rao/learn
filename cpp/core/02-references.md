@@ -82,6 +82,67 @@ int* also_bad() {
 }
 ```
 
+## 引用类型的重载匹配
+
+函数重载时，不同引用类型匹配不同值类别：
+
+```cpp
+void f(int&);        // ① 左值引用
+void f(const int&);  // ② const 左值引用
+void f(int&&);       // ③ 右值引用
+void f(const int&&); // ④ const 右值引用（极少用）
+```
+
+匹配规则：
+
+```cpp
+int a = 1;
+const int b = 2;
+
+f(a);        // ① int&（精确匹配左值）
+f(b);        // ② const int&（左值，但 const 只能匹配 ②）
+f(1);        // ③ int&&（右值优先匹配右值引用）
+f(std::move(a)); // ③ int&&
+```
+
+若只定义了 ① 和 ③，调用 `f(b)` 会匹配 ①（`int&` 可绑定到 const？→ 不行），所以实际上会找 ③，但 const 左值不能绑到右值引用。需要 ② 才能匹配 const 左值。
+
+总结：
+| 实参 | 匹配优先级 |
+|------|-----------|
+| 左值 | `T&` > `const T&` |
+| const 左值 | `const T&` |
+| 右值 | `T&&` > `const T&&` > `const T&` |
+
+## 成员函数的引用限定符（C++11）
+
+成员函数可根据对象是左值还是右值选择重载：
+
+```cpp
+struct Widget {
+    void process() &;   // 只能由左值对象调用
+    void process() &&;  // 只能由右值对象调用
+};
+
+Widget w;
+w.process();           // 调用 & 版本
+std::move(w).process();// 调用 && 版本
+```
+
+右值限定版本可以安全地"窃取"资源：
+
+```cpp
+struct Buffer {
+    std::vector<int> data;
+
+    const std::vector<int>& get() const& { return data; }
+
+    std::vector<int>&& get() && {
+        return std::move(data);  // 右值对象返回移动语义
+    }
+};
+```
+
 ### 安全做法
 
 - 返回参数中传入的引用（如 `getElement`）

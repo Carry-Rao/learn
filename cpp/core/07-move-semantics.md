@@ -73,6 +73,66 @@ using remove_reference_t = typename remove_reference<T>::type;
 
 无论 `T` 是 `T&`、`T&&` 还是 `T`，`remove_reference<T>::type` 都是 `T`。所以 `move` 始终返回 `T&&`。
 
+## Rule of Five
+
+如果一个类管理资源（如动态内存、文件句柄），那么五个特殊成员函数通常需要同时定义：
+
+1. 析构函数（destructor）
+2. 拷贝构造函数（copy constructor）
+3. 拷贝赋值运算符（copy assignment）
+4. 移动构造函数（move constructor）
+5. 移动赋值运算符（move assignment）
+
+如果一个类需要显式定义其中任何一个，大概率五个都需要。
+
+```cpp
+class Resource {
+    int* data;
+    size_t size;
+public:
+    // 1. 析构
+    ~Resource() { delete[] data; }
+
+    // 2. 拷贝构造
+    Resource(const Resource& other)
+        : data(new int[other.size]), size(other.size) {
+        std::copy(other.data, other.data + size, data);
+    }
+
+    // 3. 拷贝赋值
+    Resource& operator=(const Resource& other) {
+        if (this != &other) {
+            delete[] data;
+            size = other.size;
+            data = new int[size];
+            std::copy(other.data, other.data + size, data);
+        }
+        return *this;
+    }
+
+    // 4. 移动构造
+    Resource(Resource&& other) noexcept
+        : data(other.data), size(other.size) {
+        other.data = nullptr;
+        other.size = 0;
+    }
+
+    // 5. 移动赋值
+    Resource& operator=(Resource&& other) noexcept {
+        if (this != &other) {
+            delete[] data;
+            data = other.data;
+            size = other.size;
+            other.data = nullptr;
+            other.size = 0;
+        }
+        return *this;
+    }
+};
+```
+
+如果类不需要自定义资源管理，优先遵循 **Rule of Zero**：让编译器隐式生成所有五个函数，或用标准库组件（`vector`、`string`、`unique_ptr` 等）管理资源。
+
 ## noexcept
 
 移动操作通常标记 `noexcept`，保证不抛异常。标准库容器在重新分配时，只有 `noexcept` 的移动构造才会被使用（否则退化为拷贝）。

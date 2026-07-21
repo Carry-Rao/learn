@@ -82,6 +82,33 @@ void Student::introduce() const {
 }
 ```
 
+## 用户定义转换
+
+类可以定义隐式转换到其他类型，通过 `operator type()`。
+
+```cpp
+struct Fraction {
+    int num, den;
+
+    // 到 double 的隐式转换
+    operator double() const {
+        return static_cast<double>(num) / den;
+    }
+
+    // explicit 转换（C++11），防止意外
+    explicit operator bool() const {
+        return den != 0;
+    }
+};
+
+Fraction f{3, 4};
+double d = f;  // 隐式调用 operator double()
+// if (f)       // OK：if 条件允许 explicit bool
+// int x = f;   // 错误：无 int 转换
+```
+
+`explicit` 转换运算符只在特定语境触发（`if`、`while`、`!`、逻辑运算符），防止静默的类型转换错误。
+
 ## struct vs class
 
 | | struct | class |
