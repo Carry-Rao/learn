@@ -1,6 +1,6 @@
 # std::string 深入
 
-`std::string` 的更多高级操作。
+`std::string` 的更多高级操作、原理和简单实现。
 
 ## 查找与替换
 
@@ -11,21 +11,15 @@
 int main() {
     std::string s = "Hello World, Hello C++";
 
-    // 查找
     size_t pos = s.find("Hello");
     if (pos != std::string::npos) {
         std::cout << "Found at: " << pos << std::endl;
     }
 
-    // 从指定位置开始查找
-    pos = s.find("Hello", 5);  // 从位置 5 开始找
-
-    // 反向查找
+    pos = s.find("Hello", 5);
     pos = s.rfind("Hello");
 
-    // 替换
-    s.replace(0, 5, "Hi");     // 从 0 开始的 5 个字符替换为 "Hi"
-
+    s.replace(0, 5, "Hi");
 }
 ```
 
@@ -35,9 +29,9 @@ int main() {
 std::string s = "C++";
 
 s.insert(3, " Programming");   // "C++ Programming"
-s.erase(4, 4);                 // "C++ gramming"（删除位置 4 开始的 4 个字符）
-s.push_back('!');              // 末尾追加字符
-s.pop_back();                  // 删除末尾字符
+s.erase(4, 4);                 // "C++ gramming"
+s.push_back('!');
+s.pop_back();
 ```
 
 ## 数字转换
@@ -45,18 +39,84 @@ s.pop_back();                  // 删除末尾字符
 ```cpp
 #include <string>
 
-int i = std::stoi("42");            // std::string → int
-double d = std::stod("3.14");       // std::string → double
-std::string s = std::to_string(42); // int → std::string
+int i = std::stoi("42");
+double d = std::stod("3.14");
+std::string s = std::to_string(42);
 ```
 
-## 其他方法
+## 原理：SSO（Small String Optimization）
+
+`std::string` 通常使用 **SSO**（短字符串优化）：小字符串直接存储在栈上，避免堆分配。
+
+```
+长度 ≤ 15（GCC/libstdc++）：
+[小字符串缓冲区]           ← 栈上
+[大小] [容量]
+
+长度 > 15：
+[堆内存指针] [大小] [容量]   ← 数据在堆上
+```
+
+不同实现的 SSO 阈值：
+- libstdc++ (GCC)：15 字节（存储在 `_M_local_buf`）
+- libc++ (Clang)：22 字节
+- MSVC：16 字节
 
 ```cpp
-s.substr(pos, count);   // 取子串
-s.compare(other);       // 比较，相等返回 0
-s.data();               // 获取 C 风格字符串指针
-s.c_str();              // 获取 const char*
+// 简化 SSO 实现
+template <typename charT>
+class basic_string {
+    union {
+        charT* ptr_;        // 非 SSO：指向堆内存
+        charT buf_[16];     // SSO：栈缓冲区
+    };
+    size_t size_;
+    size_t capacity_;
+    bool is_sso() const { return capacity_ < 16; }
+};
+```
+
+## 简单实现
+
+```cpp
+class String {
+    char* data_;
+    size_t size_;
+    size_t capacity_;
+public:
+    String() : data_(new char[1]{'\0'}), size_(0), capacity_(1) {}
+
+    String(const char* s)
+        : size_(strlen(s)), capacity_(size_ + 1)
+    {
+        data_ = new char[capacity_];
+        memcpy(data_, s, size_ + 1);
+    }
+
+    String(const String& other)
+        : size_(other.size_), capacity_(other.capacity_)
+    {
+        data_ = new char[capacity_];
+        memcpy(data_, other.data_, size_ + 1);
+    }
+
+    String& operator=(const String& other) {
+        if (this != &other) {
+            delete[] data_;
+            size_ = other.size_;
+            capacity_ = other.capacity_;
+            data_ = new char[capacity_];
+            memcpy(data_, other.data_, size_ + 1);
+        }
+        return *this;
+    }
+
+    ~String() { delete[] data_; }
+
+    char& operator[](size_t i) { return data_[i]; }
+    size_t size() const { return size_; }
+    const char* c_str() const { return data_; }
+};
 ```
 
 ## std::string_view（C++17）
@@ -93,3 +153,9 @@ std::string_view bad() {
     return s;  // s 析构后 sv 悬垂！
 }
 ```
+
+## 建议
+
+- `find` 返回 `npos` 检查必须做
+- 函数参数用 `string_view` 避免不必要的拷贝
+- 短字符串 SSO 使 `string` 操作非常快
