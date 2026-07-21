@@ -1,35 +1,120 @@
 {
-  "categories": [
-    {
-      "name": "C++",
-      "slug": "cpp",
-      "columns": [
+    "categories": [
         {
-          "name": "基础入门",
-          "slug": "basic",
-          "articles": ["01-hello-world", "02-variables", "03-constants", "04-input-output", "05-operators", "06-control-flow", "07-loops", "08-functions", "09-overload", "10-arrays", "11-strings", "12-pointers-refs"]
+            "name": "C++",
+            "slug": "cpp",
+            "columns": [
+                {
+                    "name": "基础入门",
+                    "slug": "basic",
+                    "articles": [
+                        "01-hello-world",
+                        "02-variables",
+                        "03-constants",
+                        "04-input-output",
+                        "05-operators",
+                        "06-control-flow",
+                        "07-loops",
+                        "08-functions",
+                        "09-overload",
+                        "10-arrays",
+                        "11-strings",
+                        "12-pointers-refs"
+                    ]
+                },
+                {
+                    "name": "核心基础",
+                    "slug": "core",
+                    "articles": [
+                        "01-lvalue-rvalue",
+                        "02-references",
+                        "03-dynamic-memory",
+                        "04-struct-class",
+                        "05-templates",
+                        "06-RAII",
+                        "07-move-semantics",
+                        "08-forward",
+                        "09-exceptions",
+                        "10-lambdas",
+                        "11-noexcept",
+                        "12-extern-c",
+                        "13-enum-class",
+                        "14-casts"
+                    ]
+                },
+                {
+                    "name": "面向对象",
+                    "slug": "oop",
+                    "articles": [
+                        "01-inheritance",
+                        "02-polymorphism",
+                        "03-encapsulation"
+                    ]
+                },
+                {
+                    "name": "标准库",
+                    "slug": "stl",
+                    "articles": [
+                        "01-vector",
+                        "02-array",
+                        "03-string-detail",
+                        "04-map-set",
+                        "05-algorithms",
+                        "06-iterators",
+                        "07-concurrency",
+                        "08-filesystem",
+                        "09-functional",
+                        "10-utility",
+                        "11-chrono-random",
+                        "12-atomics"
+                    ]
+                },
+                {
+                    "name": "编译期编程",
+                    "slug": "compile-time",
+                    "articles": [
+                        "01-constexpr",
+                        "02-consteval-constinit",
+                        "03-static-assert",
+                        "04-type-traits",
+                        "05-decltype",
+                        "06-template-metaprogramming",
+                        "07-compiler-optimizations"
+                    ]
+                }
+            ]
         },
         {
-          "name": "核心基础",
-          "slug": "core",
-          "articles": ["01-lvalue-rvalue", "02-references", "03-dynamic-memory", "04-struct-class", "05-templates", "06-RAII", "07-move-semantics", "08-forward", "09-exceptions", "10-lambdas", "11-noexcept", "12-extern-c", "13-enum-class", "14-casts"]
-        },
-        {
-          "name": "编译期编程",
-          "slug": "compile-time",
-          "articles": ["01-constexpr", "02-consteval-constinit", "03-static-assert", "04-type-traits", "05-decltype", "06-template-metaprogramming", "07-compiler-optimizations"]
-        },
-        {
-          "name": "面向对象",
-          "slug": "oop",
-          "articles": ["01-inheritance", "02-polymorphism", "03-encapsulation"]
-        },
-        {
-          "name": "标准库",
-          "slug": "stl",
-          "articles": ["01-vector", "02-array", "03-string-detail", "04-map-set", "05-algorithms", "06-iterators", "07-concurrency", "08-filesystem", "09-functional", "10-utility", "11-chrono-random", "12-atomics"]
+            "name": "Linux 内核模块",
+            "slug": "lkm",
+            "columns": [
+                {
+                    "name": "指南",
+                    "slug": "guide",
+                    "articles": [
+                        "01-intro",
+                        "02-hello-module",
+                        "03-char-device-debug",
+                        "04-api-reference",
+                        "05-filesystem",
+                        "06-string",
+                        "07-pci",
+                        "08-memory",
+                        "09-network",
+                        "10-process",
+                        "11-sync",
+                        "12-device",
+                        "13-interrupt",
+                        "14-timer",
+                        "15-kthread",
+                        "16-proc-sysfs",
+                        "17-usb",
+                        "18-dma",
+                        "19-debug",
+                        "20-misc"
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
