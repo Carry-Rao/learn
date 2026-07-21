@@ -129,15 +129,26 @@ async function render(path) {
       const raw = await res.text();
       const md = parseMarkdown(raw);
       const title = raw.match(/^#\s+(.+)/m);
+      const artIdx = col.articles.indexOf(slug);
+      const prev = artIdx > 0 ? col.articles[artIdx - 1] : null;
+      const next = artIdx < col.articles.length - 1 ? col.articles[artIdx + 1] : null;
+
       app.innerHTML = `<div class="article-detail">
         <h2>${title ? title[1] : fileNameToTitle(file)}</h2>
         <div class="meta">${cat.name} / ${col.name}</div>
         <div class="content">${md.html}</div>
+        <div class="article-nav">
+          ${prev ? `<span class="nav-prev" data-path="${catSlug}/${colSlug}/${prev}">← ${fileNameToTitle(prev)}</span>` : '<span></span>'}
+          ${next ? `<span class="nav-next" data-path="${catSlug}/${colSlug}/${next}">${fileNameToTitle(next)} →</span>` : ''}
+        </div>
       </div>`;
       for (let i = 1; i <= md.codeCount; i++) {
         const dom = document.querySelector(`#code-block-${i}`);
         if (dom) renderCode(md.codeBlocks[i], md.codeLangs[i], dom);
       }
+      document.querySelectorAll('.article-nav span[data-path]').forEach(el =>
+        el.addEventListener('click', () => navigate(el.dataset.path.split('/')))
+      );
     }
   } catch (e) {
     app.innerHTML = `<div class="error">加载失败: ${e.message}<br><br><button onclick="location.reload()">重试</button></div>`;
